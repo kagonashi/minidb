@@ -27,9 +27,8 @@ java Main
 
 Примеры запросов:
 
+<img width="685" height="532" alt="image" src="https://github.com/user-attachments/assets/834a9350-db39-41ec-bf70-c779ee8d3d2c" />
 
-
-Ограничения: у таблицы один первичный ключ, его нельзя менять через `UPDATE`; нельзя удалить строку, на которую ссылаются из другой таблицы, и таблицу, на которую есть ссылки; строки в запросах пишутся в одинарных кавычках без кавычек внутри; скобки в `WHERE` не поддерживаются.
 
 ## Архитектура
 
@@ -49,60 +48,13 @@ java Main
 
 ### Диаграмма классов
 
-```mermaid
-classDiagram
-    class Main
-    class Database {
-        +execute(sql) String
-    }
-    class Table {
-        +insert(row)
-        +update(row, pos, value)
-        +delete(row)
-        +find(where) List
-        +createIndex(name, column)
-    }
-    class Column
-    class Index {
-        +add(value, pk)
-        +remove(value, pk)
-        +find(value) List
-    }
-    class Where {
-        +matches(row) boolean
-    }
-    class TableRepository {
-        +loadAll() Map
-        +save(table)
-        +delete(name)
-    }
-    Main --> Database
-    Database --> Table
-    Database --> Where
-    Database --> TableRepository
-    Table "1" *-- "*" Column
-    Table "1" *-- "*" Index
-```
+<img width="3791" height="3655" alt="диаграмма классов-2026-11-15-210304" src="https://github.com/user-attachments/assets/e62e6e65-80cf-4ba9-88ef-899813eb803a" />
+
 
 ### Диаграмма последовательности: `SELECT * FROM cars WHERE brand = 'BMW'`
 
-```mermaid
-sequenceDiagram
-    participant U as Пользователь
-    participant M as Main
-    participant D as Database
-    participant T as Table
-    participant I as Index
-    U->>M: запрос
-    M->>D: execute(sql)
-    D->>D: разбор запроса, создание Where
-    D->>T: find(where)
-    T->>I: find('BMW')
-    I-->>T: первичные ключи
-    T-->>D: найденные строки
-    D-->>M: текст с таблицей
-    M-->>U: вывод на экран
-```
+<img width="5340" height="3415" alt="диаграмма последовательностей-2026-11-15-210350" src="https://github.com/user-attachments/assets/5fc6acca-eefb-428a-80a6-e1250a9852ea" />
+
 
 ### Хранение на диске
 
@@ -116,25 +68,16 @@ sequenceDiagram
 Запуск: `java Benchmark` (после `javac Main.java`). Таблица `cars(id, brand, price)`, на каждую марку приходится примерно 10 строк.
 Выполняется 200 запросов вида `SELECT * FROM cars WHERE brand = '...'`, в таблице указано суммарное время. Результаты с индексом и без него сравниваются между собой и совпадают.
 
-| Строк | Без индекса, мс | С индексом, мс | Ускорение |
-|---:|---:|---:|---:|
-| 10 000 | 270 | 37 | ×7 |
-| 50 000 | 518 | 19 | ×27 |
-| 100 000 | 526 | 10 | ×52 |
+<img width="422" height="73" alt="image" src="https://github.com/user-attachments/assets/a01b8622-3915-45ce-81da-ab20dc6a7e7b" />
+
 
 Без индекса запрос просматривает всю таблицу, поэтому время растёт с её размером. С индексом ищутся только нужные строки, и время почти не зависит от размера таблицы. Точные цифры зависят от компьютера и от прогрева JVM (на 10 000 строк это заметнее всего), поэтому при проверке лучше запустить тест у себя.
 
 ## Выводы
 
 Реализована СУБД с таблицами, связанными по ключу, SQL-подобным языком запросов, хранением на диске и индексами.
-Тест показал, что индекс заметно ускоряет поиск по значению, а на 100 тысячах строк выигрыш составил более чем в 50 раз.
+Тест показал, что индекс заметно ускоряет поиск по значению, а на 100 тысячах строк выигрыш составил более чем в 100 раз.
 Недостатки: вся таблица записывается на диск при каждом изменении, индекс работает только для условия «равно», нет транзакций и `JOIN`.
-
-## Список использованных источников
-
-1. Хабр. Статья об индексировании баз данных (как индексы ускоряют поиск). https://habr.com/ru/post/724066
-2. Хабр. Статья о том, как устроены индексы в PostgreSQL (перевод). https://habr.com/en/articles/308752
-3. Хабр. Статья о сериализации объектов в Java (Serializable, ObjectOutputStream). https://habr.com/ru/articles/431524/
 
 ## Список использованных источников
 
