@@ -1,0 +1,10 @@
+CREATE TABLE owners (id INT PRIMARY KEY, name STRING, birth DATE);
+CREATE TABLE cars (id INT PRIMARY KEY, brand STRING, price DOUBLE, used BOOLEAN, owner_id INT REFERENCES owners);
+INSERT INTO owners VALUES (1, 'Ivan', '1990-05-17'), (2, 'Anna', '1985-11-02');
+INSERT INTO cars VALUES (1, 'Toyota', 25000.0, TRUE, 1);
+INSERT INTO cars (id, brand) VALUES (2, 'BMW');
+SELECT * FROM cars;
+SELECT brand, price FROM cars WHERE price > 20000;
+UPDATE cars SET price = 30000 WHERE id = 2;
+DELETE FROM cars WHERE brand = 'Toyota';
+SELECT * FROM cars;
